@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -15,6 +16,7 @@ import (
 var db *sql.DB
 var err error
 
+// Construct
 type Customer struct {
 	Address struct {
 		City   string `json:"city"`
@@ -80,6 +82,67 @@ func insertEmployees(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+
+func insCustomers(w http.ResponseWriter, r *http.Request) {
+
+	body, _ := ioutil.ReadAll(r.Body)
+
+	var request Root
+
+	if err = xml.Unmarshal(body, &request); err != nil {
+		fmt.Println("Failed decoding json message")
+	}
+
+	for i := 0; i < len(request.Customers.Customer); i++ {
+		if r.Method == "POST" {
+
+			CustomerID := request.Customers.Customer[i].CustomerID
+			CompanyName := request.Customers.Customer[i].CompanyName
+			stmt, err := db.Prepare("INSERT INTO customers (CustomerID,CompanyName) VALUES (?,?)")
+
+			_, err = stmt.Exec(CustomerID, CompanyName)
+
+			if err != nil {
+				fmt.Fprintf(w, "Data Duplicate")
+			} else {
+				fmt.Fprintf(w, "Data Created")
+			}
+			fmt.Fprintln(w, "Customer ID: "+request.Customers.Customer[i].CustomerID)
+			fmt.Fprintln(w, "Company Name : "+request.Customers.Customer[i].CompanyName)
+		}
+
+	}
+}
+func insOrders(w http.ResponseWriter, r *http.Request) {
+
+	body, _ := ioutil.ReadAll(r.Body)
+
+	var request Root
+
+	if err = xml.Unmarshal(body, &request); err != nil {
+		fmt.Println("Failed decoding json message")
+	}
+
+	for i := 0; i < len(request.Orders.Order); i++ {
+		if r.Method == "POST" {
+
+			CustomerID := request.Orders.Order[i].CustomerID
+			EmployeeID := request.Orders.Order[i].EmployeeID
+			stmt, err := db.Prepare("INSERT INTO orders (CustomerID,EmployeeID) VALUES (?,?)")
+
+			_, err = stmt.Exec(CustomerID, EmployeeID)
+
+			if err != nil {
+				fmt.Fprintf(w, "Data Duplicate")
+			} else {
+				fmt.Fprintf(w, "Data Created")
+			}
+			fmt.Fprintln(w, "CustomerID: "+request.Orders.Order[i].CustomerID)
+			fmt.Fprintln(w, "EmployeeID : "+request.Orders.Order[i].EmployeeID)
+		}
+
+	}
 }
 
 func main() {
