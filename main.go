@@ -654,37 +654,28 @@ func getCategories(w http.ResponseWriter, r *http.Request) {
 
 func getCitys(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
 	var Cityarray []city
-
 	sql := `SELECT
 				CityID,
 				IFNULL(ProvinceID,''),
 				IFNULL(CityName,'') CityName
-				
 			FROM City`
-
 	result, err := db.Query(sql)
-
 	defer result.Close()
-
 	if err != nil {
 		panic(err.Error())
 	}
-
 	for result.Next() {
-
 		var citys city
 		err := result.Scan(&citys.Cityid, &citys.Provinceid, &citys.Cityname)
-
 		if err != nil {
 			panic(err.Error())
 		}
 		Cityarray = append(Cityarray, citys)
 	}
-
 	json.NewEncoder(w).Encode(Cityarray)
 }
+
 func createCity(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "POST" {
@@ -2356,5 +2347,5 @@ func main() {
 	r.HandleFunc("/getmember", getPostMember).Methods("POST")
 
 	// Start server
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8181", r))
 }

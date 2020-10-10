@@ -30,11 +30,11 @@ func getContacts(w http.ResponseWriter, r *http.Request) {
 	var contacts []Kontak
 	sql := `SELECT
 				ID,
-				IFNULL(namadepan,'') namadepan,
-				IFNULL(namabelakang,'') namabelakang,
-				IFNULL(nohp,'') nohp,
-				IFNULL(email,'') email,
-				IFNULL(alamat,'') alamat,
+				IFNULL(NamaDepan,''),
+				IFNULL(NamaBelakang,'') NamaBelakang,
+				IFNULL(NoHp,'') NoHp,
+				IFNULL(Email,'') Email,
+				IFNULL(Alamat,'') Alamat,
 			FROM kontak`
 	result, err := db.Query(sql)
 	defer result.Close()
